@@ -8,36 +8,34 @@ st.set_page_config(page_title="Melhor Rota de Rua", layout="wide")
 
 st.title("🚗 Melhor Rota de Rua (OpenStreetMap + Streamlit)")
 
-# Entradas do usuário
-origem = st.text_input("Digite o ponto de origem:")
-destino = st.text_input("Digite o ponto de destino:")
+origem = st.text_input("Digite o ponto de origem (ex: Marina Bay Sands, Singapore):")
+destino = st.text_input("Digite o ponto de destino (ex: Orchard Road, Singapore):")
 
-modo = st.selectbox("Modo de transporte", ["car", "bike", "walk"])
+modo = st.selectbox("Modo de transporte", ["drive", "walk", "bike"])
 botao = st.button("Calcular rota")
 
 if botao and origem and destino:
     with st.spinner("Calculando rota..."):
         try:
-            # Geocodificar os endereços
-            orig_coord = ox.geocode(origem)
-            dest_coord = ox.geocode(destino)
+            # Geocodifica endereços
+            origem_coord = ox.geocode(origem)
+            destino_coord = ox.geocode(destino)
 
-            # Baixar o grafo da área
-            G = ox.graph_from_point(orig_coord, dist=3000, network_type=modo)
+            # Baixa o grafo da região
+            G = ox.graph_from_point(origem_coord, dist=3000, network_type=modo)
 
-            # Pegar os nós mais próximos
-            origem_n = ox.distance.nearest_nodes(G, orig_coord[1], orig_coord[0])
-            destino_n = ox.distance.nearest_nodes(G, dest_coord[1], dest_coord[0])
+            # Encontra nós mais próximos
+            origem_n = ox.distance.nearest_nodes(G, origem_coord[1], origem_coord[0])
+            destino_n = ox.distance.nearest_nodes(G, destino_coord[1], destino_coord[0])
 
-            # Calcular a rota mais curta
-            rota = nx.shortest_path(G, origem_n, destino_n, weight='length')
+            # Calcula rota mais curta
+            rota = nx.shortest_path(G, origem_n, destino_n, weight="length")
 
-            # Criar o mapa
-            m = ox.plot_graph_folium(G, route=rota, route_color='red', route_width=5)
-            folium.Marker(origem, popup="Origem", icon=folium.Icon(color="green")).add_to(m)
-            folium.Marker(destino, popup="Destino", icon=folium.Icon(color="red")).add_to(m)
+            # Extrai coordenadas da rota
+            rota_coords = [(G.nodes[n]["y"], G.nodes[n]["x"]) for n in rota]
 
-            st_folium(m, width=900, height=600)
-
-        except Exception as e:
-            st.error(f"Erro: {e}")
+            # Cria mapa
+            m = folium.Map(location=origem_coord, zoom_start=14)
+            folium.PolyLine(rota_coords, color="red", weight=5, opacity=0.8).add_to(m)
+            folium.Marker(origem_coord, popup="Origem", icon=folium.Icon(color="green")).add_to(m)
+            folium.Marker(destino_coord, popup="Destino", icon=folium.Icon(color="red")).add_to(m)
