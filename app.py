@@ -10,9 +10,11 @@ st.title("🚗 Melhor Rota de Rua (OpenStreetMap + Streamlit)")
 
 origem = st.text_input("Digite o ponto de origem (ex: Marina Bay Sands, Singapore):")
 destino = st.text_input("Digite o ponto de destino (ex: Orchard Road, Singapore):")
-
 modo = st.selectbox("Modo de transporte", ["drive", "walk", "bike"])
 botao = st.button("Calcular rota")
+
+if "mapa" not in st.session_state:
+    st.session_state.mapa = None
 
 if botao and origem and destino:
     with st.spinner("Calculando rota..."):
@@ -30,18 +32,19 @@ if botao and origem and destino:
 
             # Calcula rota mais curta
             rota = nx.shortest_path(G, origem_n, destino_n, weight="length")
-
-            # Extrai coordenadas da rota
             rota_coords = [(G.nodes[n]["y"], G.nodes[n]["x"]) for n in rota]
 
-            # Cria mapa
+            # Cria mapa e salva na sessão
             m = folium.Map(location=origem_coord, zoom_start=14)
             folium.PolyLine(rota_coords, color="red", weight=5, opacity=0.8).add_to(m)
             folium.Marker(origem_coord, popup="Origem", icon=folium.Icon(color="green")).add_to(m)
             folium.Marker(destino_coord, popup="Destino", icon=folium.Icon(color="red")).add_to(m)
 
-            # Mostra mapa
-            st_folium(m, width=900, height=600)
+            st.session_state.mapa = m
 
         except Exception as e:
             st.error(f"Erro: {e}")
+
+# Mostra mapa (mesmo depois do reload)
+if st.session_state.mapa:
+    st_folium(st.session_state.mapa, width=900, height=600)
