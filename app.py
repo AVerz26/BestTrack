@@ -39,3 +39,9 @@ if botao and origem and destino:
             folium.PolyLine(rota_coords, color="red", weight=5, opacity=0.8).add_to(m)
             folium.Marker(origem_coord, popup="Origem", icon=folium.Icon(color="green")).add_to(m)
             folium.Marker(destino_coord, popup="Destino", icon=folium.Icon(color="red")).add_to(m)
+
+            # Mostra mapa
+            st_folium(m, width=900, height=600)
+
+        except Exception as e:
+            st.error(f"Erro: {e}")
