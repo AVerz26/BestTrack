@@ -25,7 +25,7 @@ if botao and origem and destino:
             origem_coord = ox.geocode(origem)
             destino_coord = ox.geocode(destino)
 
-            G = ox.graph_from_point(origem_coord, dist=3000, network_type=modo)
+            G = ox.graph_from_point(origem_coord, dist=300000, network_type=modo)
             origem_n = ox.distance.nearest_nodes(G, origem_coord[1], origem_coord[0])
             destino_n = ox.distance.nearest_nodes(G, destino_coord[1], destino_coord[0])
 
