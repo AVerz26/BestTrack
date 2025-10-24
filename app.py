@@ -56,6 +56,7 @@ if botao and origem and destino:
             # Salva no estado
             st.session_state.rota_mapa = m
             st.session_state.dist_km = round(comprimento, 2)
+            duracao =  round(st.session_state.dist_km / valor, 1)
 
         except Exception as e:
             st.error(f"Erro: {e}")
@@ -65,4 +66,4 @@ if st.session_state.rota_mapa:
     st_folium(st.session_state.rota_mapa, width=900, height=600, returned_objects=[])
 
     if st.session_state.dist_km:
-        st.success(f"🛣️ Distância total: {st.session_state.dist_km} km")
+        st.success(f"🛣️ Distância total: {st.session_state.dist_km} km - Tempo estimado: {duracao} horas. ")
