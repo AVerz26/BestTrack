@@ -12,6 +12,18 @@ st.title("🚗 Melhor Rota de Rua (OpenStreetMap + Streamlit)")
 origem = st.text_input("Origem (ex: Marina Bay Sands, Singapore)")
 destino = st.text_input("Destino (ex: Orchard Road, Singapore)")
 modo = st.selectbox("Modo de transporte", ["drive", "walk", "bike"])
+
+vel_drive = 80
+vel_bike = 35
+vel_walk = 10
+
+if modo == 'drive':
+    valor = vel_drive
+elif modo == 'walk':
+    valor = vel_walk
+else:
+    valor = vel_bike
+
 botao = st.button("Calcular rota")
 
 # Sessão para guardar dados
@@ -25,7 +37,7 @@ if botao and origem and destino:
             origem_coord = ox.geocode(origem)
             destino_coord = ox.geocode(destino)
 
-            G = ox.graph_from_point(origem_coord, dist=300000, network_type=modo)
+            G = ox.graph_from_point(origem_coord, dist=50000, network_type=modo)
             origem_n = ox.distance.nearest_nodes(G, origem_coord[1], origem_coord[0])
             destino_n = ox.distance.nearest_nodes(G, destino_coord[1], destino_coord[0])
 
